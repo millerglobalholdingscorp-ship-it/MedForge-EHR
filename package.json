@@ -1,0 +1,11 @@
+{
+  "name": "medforge-ehr",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "bun run dev:backend & sleep 1 && bun run dev:frontend",
+    "dev:frontend": "cd frontend && bun run dev",
+    "dev:backend": "cd backend && bun run dev",
+    "install:all": "cd frontend && bun install && cd ../backend && bun install"
+  }
+}

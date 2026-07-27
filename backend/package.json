@@ -1,0 +1,15 @@
+{
+  "name": "medforge-ehr-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4.7.7"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.10"
+  }
+}
