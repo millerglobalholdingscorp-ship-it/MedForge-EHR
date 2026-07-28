@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { patientsRouter } from './routes/patients';
 import { contactRouter } from './routes/contact';
+import { auth } from './middleware/auth';
 
 const app = new Hono();
 
@@ -16,16 +17,17 @@ app.use(
   })
 );
 
-// Health check
+// Health check — public
 app.get('/api/health', (c) => {
   return c.json({ status: 'ok' });
 });
 
-// Patients router
-app.route('/api/patients', patientsRouter);
-
-// Contact router
+// Contact — public
 app.route('/api/contact', contactRouter);
+
+// Patients — auth required
+app.use('/api/patients/*', auth);
+app.route('/api/patients', patientsRouter);
 
 export default {
   port: 3001,

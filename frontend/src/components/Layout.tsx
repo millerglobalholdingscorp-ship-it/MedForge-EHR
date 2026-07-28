@@ -1,7 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useAuth, useClerk } from '@clerk/clerk-react';
 
 export default function Layout() {
   const location = useLocation();
+  const { isSignedIn, isLoaded } = useAuth();
+  const { signOut } = useClerk();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,16 +28,33 @@ export default function Layout() {
               >
                 Home
               </Link>
-              <Link
-                to="/dashboard"
-                className={`text-sm transition-colors ${
-                  location.pathname === '/dashboard'
-                    ? 'text-teal-400'
-                    : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                Dashboard
-              </Link>
+              {isLoaded && isSignedIn && (
+                <Link
+                  to="/dashboard"
+                  className={`text-sm transition-colors ${
+                    location.pathname === '/dashboard'
+                      ? 'text-teal-400'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {isLoaded && isSignedIn ? (
+                <button
+                  onClick={() => signOut()}
+                  className="text-sm text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <Link
+                  to="/sign-in"
+                  className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
             </nav>
           </div>
         </div>
