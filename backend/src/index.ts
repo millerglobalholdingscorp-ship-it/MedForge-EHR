@@ -1,16 +1,19 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { serveStatic } from 'hono/bun';
 import { patientsRouter } from './routes/patients';
 import { contactRouter } from './routes/contact';
 import { auth } from './middleware/auth';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const app = new Hono();
 
-// CORS for frontend dev server
+// CORS for frontend dev server (dev) or same-origin (prod)
 app.use(
   '*',
   cors({
-    origin: ['http://localhost:3000', 'http://0.0.0.0:3000'],
+    origin: isProduction ? [] : ['http://localhost:3000', 'http://0.0.0.0:3000'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -29,7 +32,13 @@ app.route('/api/contact', contactRouter);
 app.use('/api/patients/*', auth);
 app.route('/api/patients', patientsRouter);
 
+// In production, serve static files from the built frontend
+if (isProduction) {
+  app.use('/assets/*', serveStatic({ root: './public' }));
+  app.get('/*', serveStatic({ path: './public/index.html' }));
+}
+
 export default {
-  port: 3001,
+  port: isProduction ? 3000 : 3001,
   fetch: app.fetch,
 };

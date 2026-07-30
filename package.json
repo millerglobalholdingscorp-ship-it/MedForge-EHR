@@ -6,6 +6,8 @@
     "dev": "bun run dev:backend & sleep 1 && bun run dev:frontend",
     "dev:frontend": "cd frontend && bun run dev",
     "dev:backend": "cd backend && bun run dev",
+    "build": "cd frontend && bun run build",
+    "start": "cd backend && NODE_ENV=production bun run src/index.ts",
     "install:all": "cd frontend && bun install && cd ../backend && bun install"
   }
 }
