@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import sql from '../db';
+import { logAudit } from '../db/audit';
+import '../env.js';
 
 export const patientsRouter = new Hono();
 
@@ -41,6 +43,13 @@ patientsRouter.get('/', async (c) => {
       FROM patients
       ORDER BY created_at DESC
     `;
+
+    // Audit: list all patients
+    const providerId = c.get('providerId') as string | undefined;
+    if (providerId) {
+      await logAudit(providerId, 'patient.list');
+    }
+
     return c.json({ patients, total: patients.length });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -63,6 +72,13 @@ patientsRouter.get('/:id', async (c) => {
     if (rows.length === 0) {
       return c.json({ error: 'Patient not found' }, 404);
     }
+
+    // Audit: read a specific patient
+    const providerId = c.get('providerId') as string | undefined;
+    if (providerId) {
+      await logAudit(providerId, 'patient.read', rows[0].id);
+    }
+
     return c.json({ patient: rows[0] });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -109,6 +125,15 @@ patientsRouter.post('/', async (c) => {
                 email, phone, address_line1, address_line2, city, state, zip_code,
                 created_at, updated_at
     `;
+
+    // Audit: patient created
+    const providerId = c.get('providerId') as string | undefined;
+    if (providerId) {
+      await logAudit(providerId, 'patient.created', rows[0].id, {
+        mrn: rows[0].medical_record_number,
+      });
+    }
+
     return c.json({ patient: rows[0] }, 201);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -154,6 +179,13 @@ patientsRouter.put('/:id', async (c) => {
     if (rows.length === 0) {
       return c.json({ error: 'Patient not found' }, 404);
     }
+
+    // Audit: patient updated
+    const providerId = c.get('providerId') as string | undefined;
+    if (providerId) {
+      await logAudit(providerId, 'patient.updated', rows[0].id);
+    }
+
     return c.json({ patient: rows[0] });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

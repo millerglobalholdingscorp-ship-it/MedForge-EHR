@@ -23,6 +23,12 @@ export async function auth(c: Context, next: Next) {
 
     // Store the verified session claims on the context for downstream handlers
     c.set('clerkAuth', payload);
+
+    // Extract the Clerk user ID (sub) for audit logging
+    const providerId = (payload as { sub?: string }).sub;
+    if (providerId) {
+      c.set('providerId', providerId);
+    }
   } catch {
     return c.json({ error: 'Unauthorized — token verification failed' }, 401);
   }
