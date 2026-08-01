@@ -4,7 +4,9 @@ import { serveStatic } from 'hono/bun';
 import { patientsRouter } from './routes/patients';
 import { contactRouter } from './routes/contact';
 import { notesRouter } from './routes/notes';
+import { patientPortalRouter } from './routes/patient-portal';
 import { auth } from './middleware/auth';
+import { patientAuth } from './middleware/patient-auth';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -36,6 +38,10 @@ app.route('/api/patients', patientsRouter);
 // Notes — auth required
 app.use('/api/notes/*', auth);
 app.route('/', notesRouter);
+
+// Patient portal — authenticated users are matched to their patient record by email
+app.use('/api/portal/*', patientAuth);
+app.route('/api/portal', patientPortalRouter);
 
 // In production, serve static files from the built frontend
 if (isProduction) {

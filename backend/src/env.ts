@@ -8,6 +8,8 @@ declare module 'hono' {
   interface ContextVariableMap {
     /** Clerk user ID extracted from the verified auth token */
     providerId: string;
+    /** Email extracted from the authenticated Clerk token for patient portal lookup */
+    userEmail: string;
     /** Full Clerk session claims */
     clerkAuth: unknown;
   }
