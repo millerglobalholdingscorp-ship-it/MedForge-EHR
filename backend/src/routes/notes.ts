@@ -43,7 +43,7 @@ notesRouter.get('/api/patients/:id/notes', async (c) => {
       SELECT id, patient_id, provider_id, subjective, objective, assessment, plan,
              created_at, updated_at
       FROM clinical_notes
-      WHERE patient_id = ${patientId}
+      WHERE patient_id = ${patientId} AND facility_id = ${c.get('facilityId') as string}
       ORDER BY created_at DESC
     `;
 
@@ -85,17 +85,18 @@ notesRouter.post('/api/patients/:id/notes', async (c) => {
   try {
     // Verify the patient exists
     const patientCheck = await sql`
-      SELECT id FROM patients WHERE id = ${patientId}
+      SELECT id FROM patients WHERE id = ${patientId} AND facility_id = ${c.get('facilityId') as string}
     `;
     if (patientCheck.length === 0) {
       return c.json({ error: 'Patient not found' }, 404);
     }
 
     const rows = await sql`
-      INSERT INTO clinical_notes (patient_id, provider_id, subjective, objective, assessment, plan)
+      INSERT INTO clinical_notes (patient_id, provider_id, facility_id, subjective, objective, assessment, plan)
       VALUES (
         ${patientId},
         ${providerId},
+        ${c.get('facilityId') as string},
         ${note.subjective ?? null},
         ${note.objective ?? null},
         ${note.assessment ?? null},
@@ -127,7 +128,7 @@ notesRouter.get('/api/notes/:id', async (c) => {
       SELECT id, patient_id, provider_id, subjective, objective, assessment, plan,
              created_at, updated_at
       FROM clinical_notes
-      WHERE id = ${noteId}
+      WHERE id = ${noteId} AND facility_id = ${c.get('facilityId') as string}
     `;
 
     if (rows.length === 0) {
@@ -179,7 +180,7 @@ notesRouter.put('/api/notes/:id', async (c) => {
         assessment = ${note.assessment ?? null},
         plan = ${note.plan ?? null},
         updated_at = NOW()
-      WHERE id = ${noteId}
+      WHERE id = ${noteId} AND facility_id = ${c.get('facilityId') as string}
       RETURNING id, patient_id, provider_id, subjective, objective, assessment, plan,
                 created_at, updated_at
     `;

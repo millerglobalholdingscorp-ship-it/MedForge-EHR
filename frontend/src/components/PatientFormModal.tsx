@@ -6,6 +6,7 @@ import type {
   FormErrors,
 } from '../types/patient';
 import { emptyFormData } from '../types/patient';
+import { facilityHeaders } from '../lib/facility';
 
 interface PatientFormModalProps {
   mode: FormMode;
@@ -101,7 +102,7 @@ export default function PatientFormModal({
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, ...facilityHeaders(),
         },
         body: JSON.stringify(formData),
       });

@@ -41,6 +41,7 @@ patientsRouter.get('/', async (c) => {
              email, phone, address_line1, address_line2, city, state, zip_code,
              created_at, updated_at
       FROM patients
+      WHERE facility_id = ${c.get('facilityId') as string}
       ORDER BY created_at DESC
     `;
 
@@ -67,7 +68,7 @@ patientsRouter.get('/:id', async (c) => {
              email, phone, address_line1, address_line2, city, state, zip_code,
              created_at, updated_at
       FROM patients
-      WHERE id = ${id}
+      WHERE id = ${id} AND facility_id = ${c.get('facilityId') as string}
     `;
     if (rows.length === 0) {
       return c.json({ error: 'Patient not found' }, 404);
@@ -107,7 +108,7 @@ patientsRouter.post('/', async (c) => {
     const rows = await sql`
       INSERT INTO patients (
         medical_record_number, first_name, last_name, date_of_birth,
-        email, phone, address_line1, address_line2, city, state, zip_code
+        email, phone, address_line1, address_line2, city, state, zip_code, facility_id
       ) VALUES (
         ${mrn},
         ${(body.first_name as string).trim()},
@@ -119,7 +120,8 @@ patientsRouter.post('/', async (c) => {
         ${(body.address_line2 as string)?.trim() || null},
         ${(body.city as string)?.trim() || null},
         ${(body.state as string)?.trim() || null},
-        ${(body.zip_code as string)?.trim() || null}
+        ${(body.zip_code as string)?.trim() || null},
+        ${c.get('facilityId') as string}
       )
       RETURNING id, medical_record_number, first_name, last_name, date_of_birth,
                 email, phone, address_line1, address_line2, city, state, zip_code,
@@ -171,7 +173,7 @@ patientsRouter.put('/:id', async (c) => {
         state = ${(body.state as string)?.trim() || null},
         zip_code = ${(body.zip_code as string)?.trim() || null},
         updated_at = NOW()
-      WHERE id = ${id}
+      WHERE id = ${id} AND facility_id = ${c.get('facilityId') as string}
       RETURNING id, medical_record_number, first_name, last_name, date_of_birth,
                 email, phone, address_line1, address_line2, city, state, zip_code,
                 created_at, updated_at

@@ -6,6 +6,7 @@ import { contactRouter } from './routes/contact';
 import { notesRouter } from './routes/notes';
 import { patientPortalRouter } from './routes/patient-portal';
 import { appointmentsRouter, appointmentsPortalRouter } from './routes/appointments';
+import { facilitiesRouter } from './routes/facilities';
 import { auth } from './middleware/auth';
 import { patientAuth } from './middleware/patient-auth';
 
@@ -19,7 +20,7 @@ app.use(
   cors({
     origin: isProduction ? [] : ['http://localhost:3000', 'http://0.0.0.0:3000'],
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowHeaders: ['Content-Type', 'Authorization', 'x-facility-slug'],
     credentials: true,
   })
 );
@@ -32,7 +33,10 @@ app.get('/api/health', (c) => {
 // Contact — public
 app.route('/api/contact', contactRouter);
 
-// Patients — auth required
+// Facilities and patients — auth required
+app.use('/api/facilities', auth);
+app.use('/api/facilities/*', auth);
+app.route('/api/facilities', facilitiesRouter);
 app.use('/api/patients/*', auth);
 app.route('/api/patients', patientsRouter);
 
