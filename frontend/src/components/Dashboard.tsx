@@ -4,6 +4,7 @@ import type { Patient, FormMode } from '../types/patient';
 import PatientTable from './PatientTable';
 import PatientFormModal from './PatientFormModal';
 import PatientDetailModal from './PatientDetailModal';
+import Appointments from './Appointments';
 
 type ModalState =
   | { kind: 'closed' }
@@ -110,6 +111,7 @@ export default function Dashboard() {
         onView={openDetail}
         onEdit={openEdit}
       />
+      <Appointments getToken={getToken} patients={patients} />
 
       {modal.kind === 'form' && (
         <PatientFormModal

@@ -5,6 +5,7 @@ import { patientsRouter } from './routes/patients';
 import { contactRouter } from './routes/contact';
 import { notesRouter } from './routes/notes';
 import { patientPortalRouter } from './routes/patient-portal';
+import { appointmentsRouter, appointmentsPortalRouter } from './routes/appointments';
 import { auth } from './middleware/auth';
 import { patientAuth } from './middleware/patient-auth';
 
@@ -39,9 +40,12 @@ app.route('/api/patients', patientsRouter);
 app.use('/api/notes/*', auth);
 app.route('/', notesRouter);
 
-// Patient portal — authenticated users are matched to their patient record by email
+// Appointments — provider and patient portal routes have separate auth scopes
+app.use('/api/appointments/*', auth);
+app.route('/api/appointments', appointmentsRouter);
 app.use('/api/portal/*', patientAuth);
 app.route('/api/portal', patientPortalRouter);
+app.route('/api/portal', appointmentsPortalRouter);
 
 // In production, serve static files from the built frontend
 if (isProduction) {
