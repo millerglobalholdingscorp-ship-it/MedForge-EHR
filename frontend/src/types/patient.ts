@@ -15,6 +15,17 @@ export interface Patient {
   updated_at: string;
 }
 
+export interface ClinicalNote {
+  id: string;
+  patient_id: string;
+  provider_id: string;
+  subjective: string | null;
+  objective: string | null;
+  assessment: string | null;
+  plan: string | null;
+  created_at: string;
+  updated_at: string;
+}
 export interface PatientFormData {
   first_name: string;
   last_name: string;

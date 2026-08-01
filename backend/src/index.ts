@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { serveStatic } from 'hono/bun';
 import { patientsRouter } from './routes/patients';
 import { contactRouter } from './routes/contact';
+import { notesRouter } from './routes/notes';
 import { auth } from './middleware/auth';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -31,6 +32,10 @@ app.route('/api/contact', contactRouter);
 // Patients — auth required
 app.use('/api/patients/*', auth);
 app.route('/api/patients', patientsRouter);
+
+// Notes — auth required
+app.use('/api/notes/*', auth);
+app.route('/', notesRouter);
 
 // In production, serve static files from the built frontend
 if (isProduction) {

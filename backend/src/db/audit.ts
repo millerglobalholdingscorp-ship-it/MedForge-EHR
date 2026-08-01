@@ -4,7 +4,11 @@ export type AuditAction =
   | 'patient.created'
   | 'patient.read'
   | 'patient.updated'
-  | 'patient.list';
+  | 'patient.list'
+  | 'note.created'
+  | 'note.read'
+  | 'note.updated'
+  | 'note.list';
 
 /**
  * Log an audit entry for a patient record access.
