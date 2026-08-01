@@ -29,6 +29,7 @@ export default function Layout() {
                 Home
               </Link>
               {isLoaded && isSignedIn && (
+                <>
                 <Link
                   to="/dashboard"
                   className={`text-sm transition-colors ${
@@ -39,6 +40,15 @@ export default function Layout() {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  to="/portal"
+                  className={`text-sm transition-colors ${
+                    location.pathname.startsWith('/portal') ? 'text-teal-400' : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Patient Portal
+                </Link>
+                </>
               )}
               {isLoaded && isSignedIn ? (
                 <button

@@ -6,10 +6,10 @@ import '../env.js';
 export const notesRouter = new Hono();
 
 interface NoteBody {
-  subjective?: string;
-  objective?: string;
-  assessment?: string;
-  plan?: string;
+  subjective: string | null;
+  objective: string | null;
+  assessment: string | null;
+  plan: string | null;
 }
 
 function validateNoteBody(body: Record<string, unknown>): string | null {
