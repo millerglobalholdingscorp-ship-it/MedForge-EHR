@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import type { ClinicalNote } from '../types/patient';
+import { facilityHeaders } from '../lib/facility';
 
 interface NoteEditorProps {
   patientId: string;
@@ -91,7 +92,7 @@ export default function NoteEditor({
         method: isEdit && note ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, ...facilityHeaders(),
         },
         body: JSON.stringify(trimmed),
       });

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import type { Patient, ClinicalNote } from '../types/patient';
 import NoteEditor from './NoteEditor';
+import { facilityHeaders } from '../lib/facility';
 
 interface PatientDetailModalProps {
   patient: Patient;
@@ -65,7 +66,7 @@ export default function PatientDetailModal({
     try {
       const token = await getToken();
       const res = await fetch(`/api/patients/${patient.id}/notes`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, ...facilityHeaders() },
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));

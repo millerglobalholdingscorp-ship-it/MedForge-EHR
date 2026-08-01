@@ -5,6 +5,8 @@ import PatientTable from './PatientTable';
 import PatientFormModal from './PatientFormModal';
 import PatientDetailModal from './PatientDetailModal';
 import Appointments from './Appointments';
+import { facilityHeaders, fetchFacilities, getFacilitySlug } from '../lib/facility';
+import type { Facility } from '../types/facility';
 
 type ModalState =
   | { kind: 'closed' }
@@ -18,6 +20,11 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>({ kind: 'closed' });
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [facilitySlug, setFacilitySlug] = useState(getFacilitySlug);
+
+  useEffect(() => { getToken().then(token => fetchFacilities(token).then(setFacilities).catch(() => undefined)); }, [getToken]);
+  const selectFacility = (slug: string) => { localStorage.setItem('medforge-facility-slug', slug); setFacilitySlug(slug); };
 
   const fetchPatients = useCallback(async () => {
     setLoading(true);
@@ -25,7 +32,7 @@ export default function Dashboard() {
     try {
       const token = await getToken();
       const res = await fetch('/api/patients', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, ...facilityHeaders() },
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -40,7 +47,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [getToken]);
+  }, [getToken, facilitySlug]);
 
   useEffect(() => {
     fetchPatients();
@@ -73,11 +80,12 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Provider Dashboard</h1>
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+        <div><h1 className="text-3xl font-bold text-white">Provider Dashboard</h1>
         <p className="mt-2 text-gray-400">
           Manage your patients, view records, and coordinate care.
-        </p>
+        </p></div>
+        <label className="text-sm text-gray-300">Facility <select value={facilitySlug} onChange={e => selectFacility(e.target.value)} className="ml-2 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white"><option value="default">Default Clinic</option>{facilities.filter(f => f.slug !== 'default').map(f => <option key={f.id} value={f.slug}>{f.name}</option>)}</select></label>
       </div>
 
       {/* Stats bar — shows live count once loaded */}
@@ -111,7 +119,7 @@ export default function Dashboard() {
         onView={openDetail}
         onEdit={openEdit}
       />
-      <Appointments getToken={getToken} patients={patients} />
+      <Appointments getToken={getToken} patients={patients} facilityHeaders={facilityHeaders} />
 
       {modal.kind === 'form' && (
         <PatientFormModal
